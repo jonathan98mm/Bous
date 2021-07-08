@@ -23,7 +23,7 @@
 - Configurar el proyecto Django para usar PostgreSQL :ok:
 
 ##### 2.3 Crear la página web para cargar el Excel
-- Crear una plantilla básica para cargar el Excel y leer su información.
+- Crear una plantilla básica para cargar el Excel y leer su información. :ok:
 - Crear una plantilla que permita seleccionar el formato de salida de la información.
 
 ##### 2.4 Leer un archivo Excel y guardar la información
