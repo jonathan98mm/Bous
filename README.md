@@ -20,7 +20,7 @@
 ##### 2.2 Configuración del proyecto en Docker
 - Crear los archivos Dockerfile, docker-compose y requirements.txt :ok:
 - Crear el proyecto Django :ok:
-- Configurar el proyecto Django para usar PostgreSQL
+- Configurar el proyecto Django para usar PostgreSQL :ok:
 
 ##### 2.3 Crear la página web para cargar el Excel
 - Crear una plantilla básica para cargar el Excel y leer su información.
