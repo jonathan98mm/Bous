@@ -24,12 +24,12 @@
 
 ##### 2.3 Crear la página web para cargar el Excel
 - Crear una plantilla básica para cargar el Excel y leer su información. :ok:
-- Crear una plantilla que permita seleccionar el formato de salida de la información.
+- Crear una plantilla que permita seleccionar el formato de salida de la información. :ok:
 
 ##### 2.4 Leer un archivo Excel y guardar la información
-- Crear el método que se encargará de leer el archivo Excel
-- Guardar la información del Excel en la base de datos.
-- Comprobar su funcionamiento
+- Crear el método que se encargará de leer el archivo Excel :ok:
+- Guardar la información del Excel en la base de datos. :ok:
+- Comprobar su funcionamiento :ok:
 
 ##### 2.5 Creación del servicio REST
 - Crear el método que reciba los 2 parametros necesarios.
