@@ -9,7 +9,7 @@
     <style>
         body{
             background: rgb(2,0,36);
-            background: radial-gradient(circle, rgba(2,0,36,1) 0%, rgba(222,51,4,1) 0%, rgba(237,190,107,1) 84%);
+            background: linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(222,4,16,1) 0%, rgba(234,107,237,1) 100%);
         }
     </style>
 </head>
@@ -21,10 +21,8 @@
     <div class="container" style="margin-top: 2em;">
         <div class="card text-center">
             <div class="card-body">
-                {{mensaje}}
-                <br/>
-                <br/>
-                <a href="{% url 'informacion' %}" class="btn btn-primary">Obtener informacion</a>
+                
+                <a href="#" class="btn btn-primary">Obtener informacion</a>
                 <a href="{% url 'principal' %}" class="btn btn-danger">Regresar</a>
             </div>
         </div>

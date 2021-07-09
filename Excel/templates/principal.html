@@ -14,22 +14,27 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-dark bg-primary">
       <span class="navbar-brand mb-0 h1">Bous</span>
     </nav>
 
-    <div class="card">
-        <div class="card-body">
-            <form action="{% url 'principal' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <p>{{form.non_field_errors}}</p>
-                <p>{{ form.file.label_tag }} {{ form.file.help_text }}</p>
-                <p>
-                {{ form.file.errors }}
-                {{ form.file }}
-                </p>
-                <p><input type="submit" value="Upload"/></p>
-            </form>
+    <div class="container" style="margin-top: 2em;">
+        <div class="card text-center">
+            <div class="card-body">
+                <form action="{% url 'principal' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <p>{{ form.file.label_tag }}</p>
+                    <p>
+                    {{ form.file.errors }}
+                    {{ form.file }}
+                    </p>
+                    <p><input type="submit" value="Subir archivo"/></p>
+                    <br/>
+                    <br/>
+                    <br/>
+                </form>
+                <a href="{% url 'informacion' %}" class="btn btn-primary">Obtener informacion</a>
+            </div>
         </div>
     </div>
 

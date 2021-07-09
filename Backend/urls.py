@@ -18,12 +18,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from Excel.views import principal, exito
+from Excel.views import principal, exito, info
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', principal, name="principal"),
-    path("exito", exito, name="exito")
+    path("exito", exito, name="exito"),
+    path("informacion", info, name="informacion")
 ]
 
 if settings.DEBUG:
