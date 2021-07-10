@@ -4,6 +4,7 @@ import psycopg2
 import openpyxl
 import xlrd
 import os
+import datetime
 
 # Create your views here.
 from Excel.forms import DocumentoForm
@@ -15,7 +16,8 @@ def guardar_archivo(file):
         for chunk in file.chunks():
             destino.write(chunk)
 
-
+def convertirFecha(num, book):
+    return datetime.datetime(*xlrd.xldate_as_tuple(num, book.datemode))
 def guardar_a_bd(file):
     
     try:
@@ -26,14 +28,93 @@ def guardar_a_bd(file):
         if file.name.endswith(".xls"):
             table_name = file.name[:len(file.name) - 4].replace(" ", "_")
             
-            cur.execute(f"SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND tablename='{table_name.lower()}';")
+            cur.execute(f"SELECT EXISTS (SELECT * FROM pg_catalog.pg_tables WHERE schemaname != 'pg_catalog' AND schemaname != 'information_schema' AND tablename='{table_name.lower()}');")
+            
+            flag = bool(cur.fetchone()[0])
 
-            if not cur.fetchone()[0]:
+            if not flag:
                 create = f"CREATE TABLE {table_name} ("
                 insert = f"INSERT INTO {table_name} ("
+                
+                workbook = xlrd.open_workbook(file.name)
+                ws = workbook.sheet_by_index(0)
+                
+                cabeceros = ws.row(0)
+                aux = ws.row(1)
+                
+                for i in range(ws.ncols):
+                    cadena = ws.cell_value(0,i).replace(" ", "_")
+                    create += f"{cadena} "
+                    
+                    if(i == ws.ncols - 1):
+                        if ws.cell_type(1,i) == 1:
+                            create += "varchar"
+                        elif ws.cell_type(1,i) == 3:
+                            create += "date"
+                        elif ws.cell_type(1,i) == 2:
+                            create += "numeric"
+                            
+                        insert += f"{cadena}"
+                    else:
+                        if ws.cell_type(1,i) == 1:
+                            create += "varchar, "
+                        elif ws.cell_type(1,i) == 3:
+                            create += "date, "
+                        elif ws.cell_type(1,i) == 2:
+                            create += "numeric, "
+                            
+                        insert += f"{cadena}, "
+                        
+                create += ");"
+                insert += ") VALUES "
+                        
+                print(create)
+                
+                cur.execute(create)
+                conn.commit()
+                
+                for i in range(1, ws.nrows):
+                    for j in range(ws.ncols):
+                        
+                        if j == 0:
+                            insert += "("
+                        
+                        if i == ws.nrows -1:
+                            if j == ws.ncols - 1:
+                                if ws.cell_type(i,j) == 3:
+                                    insert += f"'{convertirFecha(ws.cell_value(i,j), workbook)}'); "
+                                else:
+                                    insert += f"'{ws.cell_value(i,j)}'); "
+                            else:
+                                if ws.cell_type(i,j) == 3:
+                                    insert += f"'{convertirFecha(ws.cell_value(i,j), workbook)}', "
+                                else:
+                                    insert += f"'{ws.cell_value(i,j)}', "
+                        else:
+                            if j == ws.ncols - 1:
+                                if ws.cell_type(i,j) == 3:
+                                    insert += f"'{convertirFecha(ws.cell_value(i,j), workbook)}'), "
+                                else:
+                                    insert += f"'{ws.cell_value(i,j)}'), "
+                            else:
+                                if ws.cell_type(i,j) == 3:
+                                    insert += f"'{convertirFecha(ws.cell_value(i,j), workbook)}', "
+                                else:
+                                    insert += f"'{ws.cell_value(i,j)}', "
+                
+                print(insert)
+                
+                cur.execute(insert)
+                conn.commit()
+                
+                if os.path.exists(file.name):
+                    os.remove(file.name)
 
                 return "cargado"
             else:
+                if os.path.exists(file.name):
+                    os.remove(file.name)
+                    
                 return "existe"
         elif file.name.endswith(".xlsx"):
             table_name = file.name[:len(file.name) - 5].replace(" ", "_")
@@ -104,15 +185,25 @@ def guardar_a_bd(file):
                 cur.execute(insert)
                 conn.commit()
                 
-                os.remove(file.name)
+                if os.path.exists(file.name):
+                    os.remove(file.name)
                 
                 return "cargado"
             else:
+                if os.path.exists(file.name):
+                    os.remove(file.name)
+                    
                 return "existe"
         else:
+            if os.path.exists(file.name):
+                os.remove(file.name)
+                
             return "equivocado"
     except Exception as e:
         print(f"Error {e}")
+        
+        if os.path.exists(file.name):
+                os.remove(file.name)
     finally:
         conn.close
         
