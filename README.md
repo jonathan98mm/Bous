@@ -32,10 +32,10 @@
 - Comprobar su funcionamiento :ok:
 
 ##### 2.5 Creación del servicio REST
-- Crear el método que reciba los 2 parametros necesarios.
-- Obtener la información correcta en el formato requerido.
-- Comprobar que funcione para cualquier estructura de Excel
+- Crear el método que reciba los 2 parametros necesarios. :ok:
+- Obtener la información correcta en el formato requerido. :ok:
+- Comprobar que funcione para cualquier estructura de Excel. :ok:
 
 ##### 2.6 Encapsular el proyecto
-- Encapsular el proyecto con Docker.
-- Verificar que funcione como fue solicitado usando docker-compose.
+- Encapsular el proyecto con Docker. :ok:
+- Verificar que funcione como fue solicitado usando docker-compose. :ok:
