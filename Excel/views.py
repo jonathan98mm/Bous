@@ -1,10 +1,12 @@
+from django.views import View
 from django.shortcuts import render
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 import psycopg2
 import openpyxl
 import xlrd
 import os
 import datetime
+import json
 
 # Create your views here.
 from Excel.forms import DocumentoForm
@@ -52,7 +54,7 @@ def guardar_a_bd(file):
                         elif ws.cell_type(1,i) == 3:
                             create += "date"
                         elif ws.cell_type(1,i) == 2:
-                            create += "numeric"
+                            create += "real"
                             
                         insert += f"{cadena}"
                     else:
@@ -61,7 +63,7 @@ def guardar_a_bd(file):
                         elif ws.cell_type(1,i) == 3:
                             create += "date, "
                         elif ws.cell_type(1,i) == 2:
-                            create += "numeric, "
+                            create += "real, "
                             
                         insert += f"{cadena}, "
                         
@@ -143,6 +145,8 @@ def guardar_a_bd(file):
                             create += "varchar"
                         elif aux[i].number_format == "mm-dd-yy":
                             create += "date"
+                        elif aux[i].number_format == "0.00":
+                            create += "real"
                         
                         insert += f"{cadena}"
                     else:
@@ -150,6 +154,8 @@ def guardar_a_bd(file):
                             create += "varchar, "
                         elif aux[i].number_format == "mm-dd-yy":
                             create += "date, "
+                        elif aux[i].number_format == "0.00":
+                            create += "real, "
                             
                         insert += f"{cadena}, "
                         
@@ -221,9 +227,9 @@ def principal(request):
             if value == "cargado":
                 return render(request, "exito.html", {"mensaje": "¡Excel cargado con exito!"})
             elif value == "existe":
-                return render(request, "exito.html", {"mensaje": "Ya subiste ese archivo antes"})
+                return render(request, "exito.html", {"mensaje": "Ya subiste ese archivo antes, favor de verificar."})
             elif value == "equivocado":
-                return render(request, "exito.html", {"mensaje": "Verifica que sea un archivo de Excel"})
+                return render(request, "exito.html", {"mensaje": "Verifica que sea un archivo de Excel."})
     else:
         form = DocumentoForm()
 
@@ -235,3 +241,157 @@ def exito(request):
 def info(request):
     return render(request, "info.html")
 
+class ApiREST(View):
+    def get(self, request, tabla, valores):
+        
+        try:    
+            conn = psycopg2.connect(database="postgres", user = "postgres", password = "postgres", host="db")
+            cur = conn.cursor()
+            print("Base abierta")
+            
+            parametros = valores.split("@")
+            operacion = parametros[0]
+            
+            if operacion == "-":
+                
+                llave = parametros[1]
+                
+                cur.execute(f"SELECT * FROM {tabla.lower()};")
+                
+                colnames = [desc[0] for desc in cur.description]
+                rows = cur.fetchall()
+                dictionary = {}
+                lista = []
+                
+                for i in range(len(rows)):
+                    aux = {}
+                    for j in range(len(rows[i])):
+                        if isinstance(rows[i][j], datetime.date):
+                            aux[colnames[j]] = rows[i][j].strftime("%m/%d/%Y")
+                        else:
+                            aux[colnames[j]] = rows[i][j]
+                    
+                    lista.append(aux)
+                
+                dictionary[llave] = lista
+            
+                print(dictionary)
+                
+                json_object = json.dumps(dictionary, ensure_ascii=False)
+            
+                return JsonResponse(json_object, safe=False)
+            elif operacion == "count":
+                
+                llave = parametros[1]
+                columna = parametros[2]
+                
+                cur.execute(f"SELECT COUNT({columna.lower()}) FROM {tabla.lower()};")
+                
+                rows = cur.fetchone()
+                dictionary = {}
+                
+                dictionary[llave] = rows[0]
+            
+                print(dictionary)
+                
+                json_object = json.dumps(dictionary, ensure_ascii=False)
+            
+                return JsonResponse(json_object, safe=False)
+            elif operacion == "promedio":
+                
+                llave = parametros[1]
+                columna = parametros[2]
+                
+                cur.execute(f"SELECT AVG({columna.lower()}) FROM {tabla.lower()};")
+                
+                rows = cur.fetchone()
+                dictionary = {}
+                
+                dictionary[llave] = rows[0]
+            
+                print(dictionary)
+                
+                json_object = json.dumps(dictionary, ensure_ascii=False)
+            
+                return JsonResponse(json_object, safe=False)
+            elif operacion == "suma":
+                
+                llave = parametros[1]
+                columna = parametros[2]
+                
+                cur.execute(f"SELECT SUM({columna.lower()}) FROM {tabla.lower()};")
+                
+                rows = cur.fetchone()
+                dictionary = {}
+                
+                dictionary[llave] = rows[0]
+                
+                print(dictionary)
+                
+                json_object = json.dumps(dictionary, ensure_ascii=False)
+            
+                return JsonResponse(json_object, safe=False)
+            elif operacion == "concat":
+                
+                llave = parametros[1]
+                columna1 = parametros[2]
+                separador = parametros[3]
+                columna2 = parametros[4]
+                
+                cur.execute(f"SELECT CONCAT({columna1}, '{separador}', {columna2}) FROM {tabla.lower()};")
+                
+                colnames = [desc[0] for desc in cur.description]
+                rows = cur.fetchall()
+                dictionary = {}
+                lista = []
+                
+                for i in range(len(rows)):
+                    aux = {}
+                    for j in range(len(rows[i])):
+                        if isinstance(rows[i][j], datetime.date):
+                            aux[colnames[j]] = rows[i][j].strftime("%m/%d/%Y")
+                        else:
+                            aux[colnames[j]] = rows[i][j]
+                    
+                    lista.append(aux)
+                
+                dictionary[llave] = lista
+                
+                print(dictionary)
+                
+                json_object = json.dumps(dictionary, ensure_ascii=False)
+            
+                return JsonResponse(json_object, safe=False)
+            elif operacion == "filtrar":
+                
+                llave = parametros[1]
+                columnas = parametros[2]
+                
+                cur.execute(f"SELECT {columnas.lower()} FROM {tabla.lower()};")
+                
+                colnames = [desc[0] for desc in cur.description]
+                rows = cur.fetchall()
+                dictionary = {}
+                lista = []
+                
+                for i in range(len(rows)):
+                    aux = {}
+                    for j in range(len(rows[i])):
+                        if isinstance(rows[i][j], datetime.date):
+                            aux[colnames[j]] = rows[i][j].strftime("%m/%d/%Y")
+                        else:
+                            aux[colnames[j]] = rows[i][j]
+                    
+                    lista.append(aux)
+                
+                dictionary[llave] = lista
+                
+                print(dictionary)
+                
+                json_object = json.dumps(dictionary, ensure_ascii=False)
+            
+                return JsonResponse(json_object, safe=False)
+        except Exception as e:
+            print(f"Error {e}")
+        finally:
+            conn.close

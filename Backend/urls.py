@@ -14,17 +14,18 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from Excel.views import principal, exito, info
+from Excel.views import ApiREST, exito, info, principal
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', principal, name="principal"),
     path("exito", exito, name="exito"),
-    path("informacion", info, name="informacion")
+    path("informacion", info, name="informacion"),
+    path("api/<str:tabla>/<str:valores>", ApiREST.as_view(), name="api")
 ]
 
 if settings.DEBUG:

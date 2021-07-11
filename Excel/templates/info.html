@@ -19,14 +19,220 @@
     </nav>
 
     <div class="container" style="margin-top: 2em;">
-        <div class="card text-center">
+        <div class="card">
+            <div class="card-header" style="font-size: x-small;">
+                Esta es la página para seleccionar como quieres obtener la información, trata de no dejar ningún 
+                campo sin llenar.
+            </div>
             <div class="card-body">
-                
-                <a href="#" class="btn btn-primary">Obtener informacion</a>
+                <div id="informacion" style="font-size: smaller;">
+                    Esta es la operación básica, solo índica el Excel y el nombre de la llave principal 
+                    del JSON. Obtendrá todos los datos en la tabla.
+                </div>
+                <br/>
+                <form id="formulario">
+                    <div class="mb-3">
+                        <label for="tabla" class="form-label">Nombre de la tabla</label>
+                        <input type="text" placeholder="Tabla" class="form-control" id="tabla" aria-describedby="tablaAyuda">
+                        <div id="tablaAyuda" class="form-text" style="font-size: x-small;">Este es el nombre del Excel o tabla para extraer información (sin extension de archivo)</div>
+                        
+                        <br/>
+
+                        <label id="agrupacion_label" for="agrupacion" class="form-label">Nombre de la agrupación</label>
+                        <input id="agrupacion" type="text" placeholder="Llave principal" class="form-control" id="agrupacion" aria-describedby="agrupacionAyuda"/>
+                        <div id="agrupacionAyuda" class="form-text" style="font-size: x-small;">Este sera el nombre de la llave principal del JSON</div>
+
+                        <br/>
+
+                        <label id="operacion_label" for="operacion" class="form-label">Nombre de la operación: </label>
+                        <select class="form-select form-select-lg" id="operacion" onchange="mostrar()">
+                            <option value ="-" selected>Obtener todo</option>
+                            <option value="count">Contar</option>
+                            <option value="promedio">Promedio</option>
+                            <option value="suma">Suma</option>
+                            <option value="concat">Concatenar</option>
+                            <option value="filtrar">Filtrar</option>
+                        </select>
+
+                        <br/>
+                        <br/>
+
+                        <label id="count_label" for="count" class="form-label" hidden>Nombre de la columna</label>
+                        <input id="count" type="text" placeholder="Columna" class="form-control" id="agrupacion" aria-describedby="countAyuda" hidden/>
+                        <div id="countAyuda" class="form-text" style="font-size: x-small;" hidden>Esta sera la columna a la que se le aplicará la operación</div>
+
+                        <br/>
+
+                        <label id="aux_label" for="aux" class="form-label" hidden>Nombre de la columna 2</label>
+                        <input id="aux" type="text" placeholder="Columna 2" class="form-control" id="agrupacion" aria-describedby="auxAyuda" hidden/>
+                        <div id="auxAyuda" class="form-text" style="font-size: x-small;" hidden>Esta sera la columna a la que se le aplicará la operación</div>
+
+                        <br/>
+
+                        <label id="aux2_label" for="aux2" class="form-label" hidden>Separador de la concatenación</label>
+                        <input id="aux2" type="text" placeholder="Separador" class="form-control" id="agrupacion" aria-describedby="aux2Ayuda" hidden/>
+                        <div id="aux2Ayuda" class="form-text" style="font-size: x-small;" hidden>Este será el separador para la concatenación de las dos columnas (se permite cualquier cadena y o carácter, exceptuando a "@")</div>
+                    </div>
+                </form>
+                <button onclick="procesar()" class="btn btn-primary">Obtener información</button>
+                <br/>
+                <br/>
                 <a href="{% url 'principal' %}" class="btn btn-danger">Regresar</a>
             </div>
         </div>
     </div>
+
+    <script>
+        function procesar(){
+            var operacion = $("#operacion").val();
+
+            if(operacion == "-"){
+                var tabla = $("#tabla").val();
+                var agrupacion = $("#agrupacion").val();
+
+                window.location.href = "api/"+ tabla+ "/" + operacion + "@" + agrupacion;
+            }
+
+            if(operacion == "count"){
+                var tabla = $("#tabla").val();
+                var agrupacion = $("#agrupacion").val();
+                var columna = $("#count").val();
+
+                window.location.href = "api/" + tabla + "/" + operacion + "@" + agrupacion + "@" + columna;
+            }
+
+            if(operacion == "promedio"){
+                var tabla = $("#tabla").val();
+                var agrupacion = $("#agrupacion").val();
+                var columna = $("#count").val();
+                
+                window.location.href = "api/" + tabla + "/" + operacion + "@" + agrupacion + "@" + columna;
+            }
+
+            if(operacion == "suma"){
+                var tabla = $("#tabla").val();
+                var agrupacion = $("#agrupacion").val();
+                var columna = $("#count").val();
+                
+                window.location.href = "api/" + tabla + "/" + operacion + "@" + agrupacion + "@" + columna;
+            }
+
+            if(operacion == "concat"){
+                var tabla = $("#tabla").val();
+                var agrupacion = $("#agrupacion").val();
+                var columna1 = $("#count").val();
+                var columna2 = $("#aux").val();
+                var separador = $("#aux2").val();
+
+                window.location.href = "api/" + tabla + "/" + operacion + "@" + agrupacion + "@" + columna1 + "@" + separador + "@" + columna2;
+            }
+
+            if(operacion == "filtrar"){
+                var tabla = $("#tabla").val();
+                var agrupacion = $("#agrupacion").val();
+                var columna = $("#count").val();
+
+                window.location.href = "api/" + tabla + "/" + operacion + "@" + agrupacion + "@" + columna;
+            }
+        };
+
+        function mostrar(){
+            var operacion = $("#operacion").val();
+
+            if(operacion == "-"){
+                $("#informacion").html("Esta es la operación básica, solo índica el Excel y el nombre de la llave principal del JSON. Obtendrá todos los datos en la tabla.");
+                $("#count_label").attr("hidden", true);
+                $("#count").attr("hidden", true);
+                $("#countAyuda").attr("hidden", true);
+                $("#aux_label").attr("hidden", true);
+                $("#aux").attr("hidden", true);
+                $("#auxAyuda").attr("hidden", true);
+                $("#aux2_label").attr("hidden", true);
+                $("#aux2").attr("hidden", true);
+                $("#aux2Ayuda").attr("hidden", true);
+            }
+
+            if(operacion == "count"){
+                $("#informacion").html("Esta es la operación de COUNT de SQL, solo índica la columna a la que le quieras aplicar la función.");
+                $("#count_label").removeAttr("hidden");
+                $("#count").removeAttr("hidden");
+                $("#countAyuda").removeAttr("hidden");
+                $("#count_label").html("Nombre de la columna");
+                $("#count").attr("placeholder", "Columna");
+                $("#countAyuda").html("Columna a la que se le aplicará la operación");
+                $("#aux_label").attr("hidden", true);
+                $("#aux").attr("hidden", true);
+                $("#auxAyuda").attr("hidden", true);
+                $("#aux2_label").attr("hidden", true);
+                $("#aux2").attr("hidden", true);
+                $("#aux2Ayuda").attr("hidden", true);
+            }
+
+            if(operacion == "promedio"){
+                $("#informacion").html("Esta es la operación AVG de SQL, solo índica la columna a la que quieras que se le aplique la función.");
+                $("#count_label").removeAttr("hidden");
+                $("#count").removeAttr("hidden");
+                $("#countAyuda").removeAttr("hidden");
+                $("#count_label").html("Nombre de la columna");
+                $("#count").attr("placeholder", "Columna");
+                $("#countAyuda").html("Columna a la que se le aplicará la operación");
+                $("#aux_label").attr("hidden", true);
+                $("#aux").attr("hidden", true);
+                $("#auxAyuda").attr("hidden", true);
+                $("#aux2_label").attr("hidden", true);
+                $("#aux2").attr("hidden", true);
+                $("#aux2Ayuda").attr("hidden", true);
+            }
+
+            if(operacion == "suma"){
+                $("#informacion").html("Esta es la operación SUM de SQL, solo índica la columna a la que quieras que se le aplique la función.");
+                $("#count_label").removeAttr("hidden");
+                $("#count").removeAttr("hidden");
+                $("#countAyuda").removeAttr("hidden");
+                $("#count_label").html("Nombre de la columna");
+                $("#count").attr("placeholder", "Columna");
+                $("#countAyuda").html("Columna a la que se le aplicará la operación");
+                $("#aux_label").attr("hidden", true);
+                $("#aux").attr("hidden", true);
+                $("#auxAyuda").attr("hidden", true);
+                $("#aux2_label").attr("hidden", true);
+                $("#aux2").attr("hidden", true);
+                $("#aux2Ayuda").attr("hidden", true);
+            }
+
+            if(operacion == "concat"){
+                $("#informacion").html("Esta es la operación CONCAT de SQL, debes de índicar 2 columnas y un separador para que la función junte los valores.");
+                $("#count_label").removeAttr("hidden");
+                $("#count").removeAttr("hidden");
+                $("#countAyuda").removeAttr("hidden");
+                $("#count_label").html("Nombre de la columna 1");
+                $("#count").attr("placeholder", "Columna 1");
+                $("#countAyuda").html("Nombre la primera columna a concatenar");
+                $("#aux_label").removeAttr("hidden");
+                $("#aux").removeAttr("hidden");
+                $("#auxAyuda").removeAttr("hidden");
+                $("#aux2_label").removeAttr("hidden");
+                $("#aux2").removeAttr("hidden");
+                $("#aux2Ayuda").removeAttr("hidden");
+            }
+
+            if(operacion == "filtrar"){
+                $("#informacion").html("Esta es una simple consulta SELECT de SQL, obtendrá la información de las tablas que indiques.")
+                $("#count_label").removeAttr("hidden");
+                $("#count").removeAttr("hidden");
+                $("#countAyuda").removeAttr("hidden");
+                $("#count_label").html("Nombre de las columnas a seleccionar");
+                $("#count").attr("placeholder", "Columnas");
+                $("#countAyuda").html("Columna o columnas para seleccionar (separadas por \",\")");
+                $("#aux_label").attr("hidden", true);
+                $("#aux").attr("hidden", true);
+                $("#auxAyuda").attr("hidden", true);
+                $("#aux2_label").attr("hidden", true);
+                $("#aux2").attr("hidden", true);
+                $("#aux2Ayuda").attr("hidden", true);
+            }
+        }
+    </script>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
